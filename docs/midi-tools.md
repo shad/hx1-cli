@@ -1,5 +1,3 @@
-#!/usr/bin/env bun
-
 # HX One MIDI Communication Tools 🎹
 
 ## ✅ SUCCESS! Direct MIDI Communication Working
