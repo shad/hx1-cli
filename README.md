@@ -1,10 +1,14 @@
-# Line 6 HX One Preset File Format Analysis
+# Line 6 HX One - Complete Toolkit
 
-Analysis tools and documentation for Line 6 HX One guitar effects pedal preset files.
+Comprehensive tools for Line 6 HX One guitar effects pedal: file format analysis, MIDI communication, and preset management.
 
-## Summary
+## 🎉 Major Achievement
 
-Successfully reverse-engineered the binary file format used by the Line 6 HX One for storing presets. The format is well-structured with clear patterns for effect identification and parameter storage.
+**✅ Full control over HX One presets:**
+- Binary file format reverse-engineered
+- Direct MIDI communication working
+- All tools written in TypeScript + Bun
+- Both file-based and MIDI-based workflows supported
 
 ## File Formats
 
@@ -58,6 +62,41 @@ Offset   Size  Type        Description
 ## Tools Created
 
 All tools are written in TypeScript and run with Bun.
+
+### 🎹 MIDI Communication Tools (NEW!)
+
+#### **`scan-midi.ts`** - MIDI Device Scanner
+```bash
+bun run scan-midi.ts
+```
+Detects HX One as MIDI device and shows available ports.
+
+#### **`test-midi-connection.ts`** - Connection Tester
+```bash
+bun run test-midi-connection.ts
+```
+Tests bidirectional MIDI communication and queries device info.
+
+**Output:**
+- Device: HX One
+- Manufacturer: Line 6 (00 01 0C)
+- Firmware: 3.8.3.0.0
+
+#### **`monitor-sysex.ts`** ⭐ - SysEx Traffic Monitor
+```bash
+bun run monitor-sysex.ts
+```
+Captures all MIDI messages for protocol analysis. Use this with Librarian to reverse engineer preset upload format.
+
+#### **`decode-sysex-response.ts`** - Message Decoder
+```bash
+bun run decode-sysex-response.ts
+```
+Decodes captured SysEx messages and shows protocol structure.
+
+---
+
+### 📁 File Analysis Tools
 
 ### 1. `preset-inspector.ts` - Detailed Preset Inspector ⭐
 
