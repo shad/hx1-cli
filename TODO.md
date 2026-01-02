@@ -1,0 +1,3 @@
+- Implement check-all
+- Install proper lint
+- Measure code complexity

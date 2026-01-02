@@ -65,15 +65,15 @@ All tools are written in TypeScript and run with Bun.
 
 ### 🎹 MIDI Communication Tools (NEW!)
 
-#### **`scan-midi.ts`** - MIDI Device Scanner
+#### **`src/scripts/scan-midi.ts`** - MIDI Device Scanner
 ```bash
-bun run scan-midi.ts
+bun run src/scripts/scan-midi.ts
 ```
 Detects HX One as MIDI device and shows available ports.
 
-#### **`test-midi-connection.ts`** - Connection Tester
+#### **`src/scripts/test-midi-connection.ts`** - Connection Tester
 ```bash
-bun run test-midi-connection.ts
+bun run src/scripts/test-midi-connection.ts
 ```
 Tests bidirectional MIDI communication and queries device info.
 
@@ -82,15 +82,15 @@ Tests bidirectional MIDI communication and queries device info.
 - Manufacturer: Line 6 (00 01 0C)
 - Firmware: 3.8.3.0.0
 
-#### **`monitor-sysex.ts`** ⭐ - SysEx Traffic Monitor
+#### **`src/scripts/monitor-sysex.ts`** ⭐ - SysEx Traffic Monitor
 ```bash
-bun run monitor-sysex.ts
+bun run src/scripts/monitor-sysex.ts
 ```
 Captures all MIDI messages for protocol analysis. Use this with Librarian to reverse engineer preset upload format.
 
-#### **`decode-sysex-response.ts`** - Message Decoder
+#### **`src/scripts/decode-sysex-response.ts`** - Message Decoder
 ```bash
-bun run decode-sysex-response.ts
+bun run src/scripts/decode-sysex-response.ts
 ```
 Decodes captured SysEx messages and shows protocol structure.
 
@@ -98,16 +98,16 @@ Decodes captured SysEx messages and shows protocol structure.
 
 ### 📁 File Analysis Tools
 
-### 1. `preset-inspector.ts` - Detailed Preset Inspector ⭐
+### 1. `src/scripts/preset-inspector.ts` - Detailed Preset Inspector ⭐
 
 Inspect and compare preset files with detailed parameter breakdown.
 
 ```bash
 # Inspect a single preset
-bun run preset-inspector.ts "presets/12-String.hx1p"
+bun run src/scripts/preset-inspector.ts "presets/12-String.hx1p"
 
 # Compare two presets
-bun run preset-inspector.ts "presets/70s Chorus.hx1p" "presets/Adriatic Delay.hx1p"
+bun run src/scripts/preset-inspector.ts "presets/70s Chorus.hx1p" "presets/Adriatic Delay.hx1p"
 ```
 
 **Features:**
@@ -116,12 +116,12 @@ bun run preset-inspector.ts "presets/70s Chorus.hx1p" "presets/Adriatic Delay.hx
 - Compares two presets and highlights differences
 - Clean, formatted output
 
-### 2. `extract-all-presets.ts` - Backup Extractor
+### 2. `src/scripts/extract-all-presets.ts` - Backup Extractor
 
 Extract all individual presets from a `.hx1b` backup file.
 
 ```bash
-bun run extract-all-presets.ts
+bun run src/scripts/extract-all-presets.ts
 ```
 
 **Output:**
@@ -129,28 +129,28 @@ bun run extract-all-presets.ts
 - Extracts all 129 presets as individual `.hx1p` files
 - Preserves original preset names
 
-### 3. `analyze-preset.ts` - Quick Binary Analysis
+### 3. `src/scripts/analyze-preset.ts` - Quick Binary Analysis
 
 Quick hex dump and structure analysis of a preset file.
 
 ```bash
-bun run analyze-preset.ts
+bun run src/scripts/analyze-preset.ts
 ```
 
-### 4. `analyze-backup.ts` - Backup File Scanner
+### 4. `src/scripts/analyze-backup.ts` - Backup File Scanner
 
 Scans a backup file and lists all presets.
 
 ```bash
-bun run analyze-backup.ts
+bun run src/scripts/analyze-backup.ts
 ```
 
-### 5. `parse-preset.ts` - Detailed Parser
+### 5. `src/scripts/parse-preset.ts` - Detailed Parser
 
 Comprehensive parsing with parameter type detection.
 
 ```bash
-bun run parse-preset.ts
+bun run src/scripts/parse-preset.ts
 ```
 
 ## Example Output
