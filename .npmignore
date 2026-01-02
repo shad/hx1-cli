@@ -1,0 +1,38 @@
+# Source files (users don't need TypeScript source)
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Documentation and development files
+docs/
+scripts/
+.github/
+CLAUDE.md
+
+# Configuration files
+.hx1config
+tsconfig.json
+vitest.config.ts
+.eslintrc*
+.prettierrc*
+
+# Development artifacts
+coverage/
+.vitest/
+node_modules/
+*.log
+*.tsbuildinfo
+
+# Git and editor files
+.git/
+.gitignore
+.DS_Store
+.vscode/
+.idea/
+
+# Keep these in the package:
+# - dist/ (built files)
+# - package.json
+# - README.md
+# - LICENSE (if exists)

@@ -7,6 +7,11 @@
   "bin": {
     "hx1": "./dist/index.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shad/hx-one.git"
@@ -26,7 +31,8 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "check-all": "bun run check-types && bun run lint && bun run test",
-    "complexity": "npx eslint src/**/*.ts --plugin complexity --rule 'complexity: [error, 10]'"
+    "complexity": "npx eslint src/**/*.ts --plugin complexity --rule 'complexity: [error, 10]'",
+    "prepublishOnly": "bun run check-all && bun run build"
   },
   "keywords": [
     "line6",

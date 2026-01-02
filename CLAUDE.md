@@ -663,6 +663,39 @@ Every commit must pass:
 
 ---
 
+## Issue Tracking
+
+**Project management is handled via GitHub Issues.**
+
+- All feature requests, bugs, and enhancements are tracked as GitHub issues
+- Use the `gh` CLI tool to create, view, and manage issues
+- Issues should have clear descriptions and acceptance criteria
+- Reference issue numbers in commits (e.g., `feat: add list command (#3)`)
+- Close issues automatically with commit messages (e.g., `fixes #3`, `closes #3`)
+
+### Creating Issues
+
+```bash
+# View all issues
+gh issue list
+
+# Create a new issue
+gh issue create --title "Feature: Add xyz" --body "Description..."
+
+# View an issue
+gh issue view 5
+
+# Close an issue
+gh issue close 5
+```
+
+### Active Issues
+
+Current feature roadmap and bugs are tracked at:
+https://github.com/shad/hx1-cli/issues
+
+---
+
 **Remember:** This is a professional-grade tool. Every line of code reflects on the quality of the project. Take pride in the craftsmanship
 
 
