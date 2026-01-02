@@ -64,13 +64,17 @@ hx1 prev          # Previous preset
 hx1 load 42       # Load preset #42
 
 # Control effect
-hx1 on            # Turn effect ON
-hx1 off           # Turn effect OFF (bypass)
+hx1 toggle        # Toggle effect on/off (emulates footswitch)
+hx1 flux          # Activate FLUX (momentary effect variation)
 ```
 
 ## Commands
 
+The CLI has two types of commands: **Device Control** (requires HX One connected) and **Preset Files** (works offline).
+
 ### Device Control
+
+These commands require an HX One connected via USB.
 
 #### `hx1 status`
 
@@ -146,25 +150,117 @@ $ hx1 prev
 
 ---
 
-#### `hx1 on`
+#### `hx1 toggle`
 
-Turn the effect ON.
+Toggle the effect on/off (emulates pressing the footswitch).
 
 ```bash
-$ hx1 on
-✓ Effect ON
+$ hx1 toggle
+✓ Effect toggled
 ```
+
+**Important:** CC#1 emulates the footswitch, which **toggles** the effect state. It does NOT set an absolute on/off state. This means:
+- If effect is currently OFF, it turns ON
+- If effect is currently ON, it turns OFF
+- Your script must track state if you need to know current status
 
 ---
 
-#### `hx1 off`
+#### `hx1 flux`
 
-Turn the effect OFF (bypass).
+Activate the FLUX function (momentary effect variation).
 
 ```bash
-$ hx1 off
-✓ Effect OFF
+$ hx1 flux
+✓ FLUX activated
 ```
+
+**What is FLUX?**
+FLUX is a momentary effect variation feature on HX One. The specific behavior depends on the current effect - it might create a dramatic parameter shift, momentary feedback, or other creative variation. Typically used as a momentary/held effect during performance.
+
+**Use cases:**
+- Add dramatic effect variations during performance
+- Create momentary feedback or delay trails
+- Trigger effect-specific special behaviors
+
+---
+
+### Preset Files
+
+These commands work with `.hx1p` preset files offline (no device required).
+
+#### `hx1 info <file>`
+
+Display detailed information about a preset file.
+
+```bash
+$ hx1 info "presets/70s Chorus.hx1p"
+
+Preset Information:
+
+  File:        presets/70s Chorus.hx1p
+  Name:        70s Chorus
+  Effect ID:   500 (0x1F4)
+  Data Size:   165 bytes
+  Parameters:  20
+
+Parameters:
+
+  Idx  Type       Value
+  ───  ─────────  ──────────────
+    0  Float      0.600000
+    1  BoolOrIndex  0
+    2  Float      0.400000
+    ...
+```
+
+**Use cases:**
+- Inspect preset files before loading
+- Identify effect types
+- View parameter values
+- Debug preset issues
+
+---
+
+#### `hx1 compare <file1> <file2>`
+
+Compare two preset files and show differences.
+
+```bash
+$ hx1 compare "preset1.hx1p" "preset2.hx1p"
+
+Preset Comparison:
+
+  File 1: preset1.hx1p
+  File 2: preset2.hx1p
+
+  Name 1: My Clean Tone
+  Name 2: My Clean Tone V2
+          ✗ Different names
+
+  Effect 1: 500 (0x1F4)
+  Effect 2: 500 (0x1F4)
+            ✓ Same effect
+
+Parameter Summary:
+
+  Total:       20
+  Same:        18
+  Different:   2
+
+Different Parameters:
+
+  Idx  Type       Value 1        Value 2
+  ───  ─────────  ─────────────  ─────────────
+    0  Float      0.600000       0.750000
+    2  Float      0.400000       0.500000
+```
+
+**Use cases:**
+- Find what changed between preset versions
+- Compare your settings to factory presets
+- Track preset modifications over time
+- Understand parameter differences
 
 ---
 
@@ -175,7 +271,7 @@ $ hx1 off
 hx1 load 5 && sleep 30 && hx1 load 10 && sleep 45 && hx1 load 15
 
 # Toggle effect on/off
-hx1 off && sleep 2 && hx1 on
+hx1 toggle && sleep 2 && hx1 toggle
 
 # Check connection before loading preset
 if hx1 status --json | jq -e '.connected'; then
@@ -187,6 +283,12 @@ for i in {0..10}; do
   hx1 load $i
   sleep 5
 done
+
+# Compare two preset files
+hx1 compare "original.hx1p" "modified.hx1p"
+
+# Inspect preset before loading
+hx1 info "presets/my-tone.hx1p"
 ```
 
 ---
@@ -271,9 +373,13 @@ The CLI uses standard MIDI messages to communicate with HX One:
 - **Control Change CC#72** - Navigate presets
   - Value 0 = Previous
   - Value 64 = Next
-- **Control Change CC#1** - Effect on/off
-  - Value 0 = OFF (bypass)
-  - Value 127 = ON
+- **Control Change CC#1** - Toggle effect on/off
+  - Emulates pressing the ON footswitch (toggles state)
+  - Does NOT set absolute on/off state
+  - Any value triggers a toggle
+- **Control Change CC#2** - Activate FLUX
+  - Momentary effect variation
+  - Behavior varies by effect type
 
 All communication happens on MIDI Channel 1 by default.
 
@@ -304,13 +410,40 @@ For complete technical details, see [docs/file-format.md](docs/file-format.md).
 
 ## Development
 
-### Building from Source
+### Local Development Setup
+
+To use `hx1` as a command during development (instead of `bun run dev`):
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/hx-one.git
+git clone https://github.com/shad/hx-one.git
 cd hx-one
 
+# Install dependencies
+bun install
+
+# Build and link globally
+bun run build
+bun link
+
+# Now you can use 'hx1' directly
+hx1 --version
+hx1 status
+
+# After making changes, rebuild and the command updates automatically
+bun run build
+```
+
+The `hx1` command will point to `/Users/yourusername/.bun/bin/hx1` and use your local development version.
+
+**Unlink when done:**
+```bash
+bun unlink
+```
+
+### Building from Source
+
+```bash
 # Install dependencies
 bun install
 
@@ -320,7 +453,7 @@ bun run test
 # Build
 bun run build
 
-# Run locally
+# Run without linking
 bun run dev status
 ```
 
@@ -395,18 +528,20 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Quick Reference
 
 ```bash
-# Navigation
+# Device Control (requires HX One connected)
 hx1 next                    # Next preset
 hx1 prev                    # Previous preset
 hx1 load <0-127>            # Load specific preset
-
-# Control
-hx1 on                      # Effect ON
-hx1 off                     # Effect OFF (bypass)
-
-# Information
+hx1 toggle                  # Toggle effect on/off
+hx1 flux                    # Activate FLUX (momentary effect)
 hx1 status                  # Device status
 hx1 status --json           # JSON output
+
+# Preset Files (offline)
+hx1 info <file>             # Show preset details
+hx1 compare <f1> <f2>       # Compare presets
+
+# General
 hx1 --help                  # Show help
 hx1 --version               # Show version
 ```

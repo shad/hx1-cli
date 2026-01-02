@@ -144,51 +144,38 @@ $ bun run dev prev
 
 ---
 
-### 6. `hx1 on` ✅
+### 6. `hx1 toggle` ✅
 
-**Test:** Turn effect ON
+**Test:** Toggle effect on/off
 
 ```bash
-$ bun run dev on
+$ hx1 toggle
 ```
 
 **Result:**
 ```
-✓ Effect ON
+✓ Effect toggled
 ```
 
 **Verification:**
-- ✅ Effect activated on device
+- ✅ Effect state toggled on device
 - ✅ Success message displayed
 - ✅ Clean exit
 
 **Physical Verification:**
-- HX One LED indicator turned ON
-- Audio signal processing active
+- HX One LED indicator changed state
+- Audio signal toggled on/off
 
----
+**Important Discovery:**
+CC#1 **emulates the footswitch**, which means it **toggles** the effect state rather than setting an absolute on/off state. This was confirmed by testing:
+- Sending CC#1 when effect is OFF → turns ON
+- Sending CC#1 when effect is ON → turns OFF
+- Both `hx1 on` and `hx1 off` trigger the same toggle behavior
 
-### 7. `hx1 off` ✅
-
-**Test:** Turn effect OFF (bypass)
-
-```bash
-$ bun run dev off
-```
-
-**Result:**
-```
-✓ Effect OFF
-```
-
-**Verification:**
-- ✅ Effect bypassed on device
-- ✅ Success message displayed
-- ✅ Clean exit
-
-**Physical Verification:**
-- HX One LED indicator turned OFF
-- Audio signal bypassed
+**Impact:**
+- Added new `hx1 toggle` command for clarity
+- Updated `on` and `off` commands to clarify they both toggle
+- Updated documentation to reflect toggle behavior
 
 ---
 

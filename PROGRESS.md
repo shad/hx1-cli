@@ -149,19 +149,22 @@ hx-one/
 ### Working Commands
 
 ```bash
-# Navigation
-bun run dev next          # Load next preset
-bun run dev prev          # Load previous preset
-bun run dev load 42       # Load preset 42
+# Device Control (requires HX One connected)
+hx1 next                  # Load next preset
+hx1 prev                  # Load previous preset
+hx1 load 42               # Load preset 42
+hx1 toggle                # Toggle effect on/off
+hx1 flux                  # Activate FLUX (momentary effect)
+hx1 status                # Show device status
+hx1 status --json         # JSON output
 
-# Control
-bun run dev on            # Turn effect ON
-bun run dev off           # Turn effect OFF
+# Preset Files (offline)
+hx1 info <file>           # Show preset details
+hx1 compare <f1> <f2>     # Compare two presets
 
-# Information
-bun run dev status        # Show device status
-bun run dev status --json # JSON output
-bun run dev --help        # Show help
+# General
+hx1 --help                # Show help
+hx1 --version             # Show version
 ```
 
 ### Core Features
@@ -371,10 +374,10 @@ refactor: extract MIDI error handling
 
 ## 📈 Progress Summary
 
-**Lines of Code Written:** ~2,500+
-**Files Created:** 19+
-**Commands Working:** 6 (next, prev, load, on, off, status)
-**Test Coverage:** 82.56% (95 tests passing)
+**Lines of Code Written:** ~2,700+
+**Files Created:** 21+
+**Commands Working:** 8 (next, prev, load, toggle, flux, status, info, compare)
+**Test Coverage:** 82.44% (93 tests passing)
 **Documentation:** Comprehensive
 
 **Architecture:**

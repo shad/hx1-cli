@@ -14,10 +14,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `hx1 load <preset>` - Load specific preset by number (0-127)
 - `hx1 next` - Navigate to next preset via CC#72
 - `hx1 prev` - Navigate to previous preset via CC#72
-- `hx1 on` - Turn effect ON via CC#1
-- `hx1 off` - Turn effect OFF (bypass) via CC#1
+- `hx1 toggle` - Toggle effect on/off via CC#1 (emulates footswitch)
+  - **Note:** CC#1 emulates the footswitch, which toggles the effect state
+  - Does NOT set absolute on/off state - any CC#1 message toggles
+- `hx1 flux` - Activate FLUX function via CC#2
+  - Momentary effect variation
+  - Behavior varies by effect type
 - Auto-detection of HX One MIDI device
 - JSON output support for `status` command (`--json` flag)
+
+#### Preset File Commands
+- `hx1 info <file>` - Display detailed preset file information
+  - Shows effect ID, preset name, parameters
+  - Lists all parameter types and values
+  - Works offline (no device required)
+- `hx1 compare <file1> <file2>` - Compare two preset files
+  - Identifies differences in parameters
+  - Shows which parameters changed
+  - Highlights value changes
+  - Works offline (no device required)
 
 #### Preset File Support
 - Parse `.hx1p` preset files (1440 bytes)

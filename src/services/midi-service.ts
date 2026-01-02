@@ -120,16 +120,18 @@ export class MidiService {
   }
 
   /**
-   * Turn effect ON
+   * Toggle effect on/off
+   * Emulates pressing the ON footswitch - toggles between on and off states
    * @throws MidiCommunicationError if not connected
    */
-  effectOn(): void {
+  toggleEffect(): void {
     this.ensureConnected();
 
     if (this.output === null) {
       throw new MidiCommunicationError('Not connected to device');
     }
 
+    // CC#1 toggles the effect (any value works, using 127 by convention)
     this.output.send('cc', {
       controller: MIDI_CC.ON_SWITCH,
       value: 127,
@@ -138,19 +140,21 @@ export class MidiService {
   }
 
   /**
-   * Turn effect OFF
+   * Activate FLUX function
+   * Emulates pressing the FLUX footswitch (typically held for momentary effect)
    * @throws MidiCommunicationError if not connected
    */
-  effectOff(): void {
+  activateFlux(): void {
     this.ensureConnected();
 
     if (this.output === null) {
       throw new MidiCommunicationError('Not connected to device');
     }
 
+    // CC#2 activates FLUX (using 127 by convention)
     this.output.send('cc', {
-      controller: MIDI_CC.ON_SWITCH,
-      value: 0,
+      controller: MIDI_CC.FLUX,
+      value: 127,
       channel: 0,
     });
   }

@@ -86,11 +86,17 @@ When `MIDI PC Rx` is OFF, HX One will ignore incoming Program Change messages.
 
 | CC Number | Function | Description |
 |-----------|----------|-------------|
-| CC1 | ON Switch | Emulates the ON footswitch |
+| CC1 | ON Switch | **Toggles** the effect on/off (emulates footswitch press) |
 | CC2 | FLUX | Activates FLUX function |
 | CC3 | Expression Pedal | Controls expression pedal input |
 | **CC72** | **Preset Navigation** | **Value 0 = Previous, Value 64 = Next** ⭐ |
 | Various | Effect Parameters | Control specific effect parameters |
+
+**Important Note on CC#1:**
+CC#1 emulates pressing the ON footswitch, which **toggles** the effect state. It does NOT set an absolute on/off state. Any CC#1 message (regardless of value) will toggle the effect. This means:
+- If effect is OFF, CC#1 turns it ON
+- If effect is ON, CC#1 turns it OFF
+- Your script must track state if you need to know the current on/off status
 
 **Key Discoveries:**
 - **CC#72** for next/previous preset navigation is **not documented in the manual** but confirmed working

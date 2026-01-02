@@ -205,13 +205,13 @@ describe('MidiService', () => {
     });
   });
 
-  describe('effectOn', () => {
+  describe('toggleEffect', () => {
     beforeEach(() => {
       service.connect();
     });
 
     it('should send CC#1 with value 127', () => {
-      service.effectOn();
+      service.toggleEffect();
 
       expect(mockOutputInstance.send).toHaveBeenCalledWith('cc', {
         controller: MIDI_CC.ON_SWITCH,
@@ -223,29 +223,7 @@ describe('MidiService', () => {
     it('should throw if not connected', () => {
       service.disconnect();
 
-      expect(() => service.effectOn()).toThrow(MidiCommunicationError);
-    });
-  });
-
-  describe('effectOff', () => {
-    beforeEach(() => {
-      service.connect();
-    });
-
-    it('should send CC#1 with value 0', () => {
-      service.effectOff();
-
-      expect(mockOutputInstance.send).toHaveBeenCalledWith('cc', {
-        controller: MIDI_CC.ON_SWITCH,
-        value: 0,
-        channel: 0,
-      });
-    });
-
-    it('should throw if not connected', () => {
-      service.disconnect();
-
-      expect(() => service.effectOff()).toThrow(MidiCommunicationError);
+      expect(() => service.toggleEffect()).toThrow(MidiCommunicationError);
     });
   });
 
