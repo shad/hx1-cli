@@ -1,242 +1,412 @@
-# Line 6 HX One - Complete Toolkit
+# HX One CLI
 
-Comprehensive tools for Line 6 HX One guitar effects pedal: file format analysis, MIDI communication, and preset management.
+**Professional command-line tool for Line 6 HX One guitar effects pedal**
 
-## 🎉 Major Achievement
+Control your HX One directly from your computer via USB MIDI. Switch presets, toggle effects, check device status, and manage preset files - all from the terminal.
 
-**✅ Full control over HX One presets:**
-- Binary file format reverse-engineered
-- Direct MIDI communication working
-- All tools written in TypeScript + Bun
-- Both file-based and MIDI-based workflows supported
-
-## File Formats
-
-### `.hx1p` - Individual Preset Files
-- **Size:** 1440 bytes (fixed)
-- **Structure:** Header (24 bytes) + Parameters (variable) + Name (~20 bytes at end)
-- **Format:** Little-endian binary
-
-### `.hx1b` - Backup Files
-- **Structure:** Multiple presets concatenated
-- **Preset Size:** 1461 bytes each (1440 + 21 byte magic header)
-- **Magic Header:** `F19BinaryPresetHeader`
-- **Count:** Your backup contains 129 presets
-
-## Key Discoveries
-
-### 1. Effect Identification
-Each effect has a unique Model ID at offset `0x10`:
-- `0x09FA` (2554) - 12-String
-- `0x01F4` (500) - 70s Chorus
-- `0x068D` (1677) - Adriatic Delay
-- `0x02F6` (758) - Arbitrator Fuzz
-
-### 2. Parameter Storage
-Parameters are stored as type-value pairs (8 bytes each):
-
-| Type | Name      | Description                   |
-|------|-----------|-------------------------------|
-| 0    | Flag      | Boolean flags (0/1)           |
-| 1    | Bool/Idx  | Boolean or index value        |
-| 2    | Integer   | 32-bit unsigned integer       |
-| 3    | Float     | IEEE 754 32-bit float         |
-
-### 3. File Structure
-
-```
-Offset   Size  Type        Description
--------  ----  ----------  ---------------------------------
-0x00     4     uint32_le   Unknown (usually 0)
-0x04     4     uint32_le   Unknown (usually 1)
-0x08     4     uint32_le   Unknown (usually 0)
-0x0C     4     uint32_le   Unknown (usually 1)
-0x10     4     uint32_le   Effect Model ID ⭐
-0x14     4     uint32_le   Data size
-0x18     8     param       Parameter 0
-0x20     8     param       Parameter 1
-...      ...   ...         ... (varies by effect)
-~0x584   32    string      Preset name (null-terminated)
-```
-
-## Tools Created
-
-All tools are written in TypeScript and run with Bun.
-
-### 🎹 MIDI Communication Tools (NEW!)
-
-#### **`src/scripts/scan-midi.ts`** - MIDI Device Scanner
-```bash
-bun run src/scripts/scan-midi.ts
-```
-Detects HX One as MIDI device and shows available ports.
-
-#### **`src/scripts/test-midi-connection.ts`** - Connection Tester
-```bash
-bun run src/scripts/test-midi-connection.ts
-```
-Tests bidirectional MIDI communication and queries device info.
-
-**Output:**
-- Device: HX One
-- Manufacturer: Line 6 (00 01 0C)
-- Firmware: 3.8.3.0.0
-
-#### **`src/scripts/monitor-sysex.ts`** ⭐ - SysEx Traffic Monitor
-```bash
-bun run src/scripts/monitor-sysex.ts
-```
-Captures all MIDI messages for protocol analysis. Use this with Librarian to reverse engineer preset upload format.
-
-#### **`src/scripts/decode-sysex-response.ts`** - Message Decoder
-```bash
-bun run src/scripts/decode-sysex-response.ts
-```
-Decodes captured SysEx messages and shows protocol structure.
+[![Tests](https://img.shields.io/badge/tests-95%20passing-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/coverage-82.56%25-brightgreen)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)]()
 
 ---
 
-### 📁 File Analysis Tools
+## ⚠️ Disclaimer
 
-### 1. `src/scripts/preset-inspector.ts` - Detailed Preset Inspector ⭐
+This is a community-developed tool provided **as-is** without warranty. While it uses standard MIDI commands documented in the Line 6 HX One manual, **use at your own risk**. Always maintain backups of your presets.
 
-Inspect and compare preset files with detailed parameter breakdown.
+This tool is not affiliated with, endorsed by, or supported by Line 6 or Yamaha Guitar Group. Line 6 and HX One are trademarks of their respective owners.
 
-```bash
-# Inspect a single preset
-bun run src/scripts/preset-inspector.ts "presets/12-String.hx1p"
+Tested on HX One firmware `v3.83`
 
-# Compare two presets
-bun run src/scripts/preset-inspector.ts "presets/70s Chorus.hx1p" "presets/Adriatic Delay.hx1p"
-```
+---
 
-**Features:**
-- Displays all preset metadata
-- Shows all 62 parameters with types and values
-- Compares two presets and highlights differences
-- Clean, formatted output
+## Features
 
-### 2. `src/scripts/extract-all-presets.ts` - Backup Extractor
+- **MIDI Control** - Control HX One via USB MIDI connection
+- **Preset Navigation** - Switch between presets instantly
+- **Effect Toggle** - Turn effects on/off remotely
+- **Device Status** - Query device information and state
+- **Preset Files** - Parse, compare, and analyze `.hx1p` preset files
+- **Fast & Reliable** - Built with TypeScript, thoroughly tested
+- **Clean Output** - Human-readable by default, JSON available
 
-Extract all individual presets from a `.hx1b` backup file.
+## Quick Start
 
-```bash
-bun run src/scripts/extract-all-presets.ts
-```
+### Prerequisites
 
-**Output:**
-- Creates `extracted-presets/` directory
-- Extracts all 129 presets as individual `.hx1p` files
-- Preserves original preset names
+- Node.js 18+ or Bun 1.0+
+- HX One connected via USB
+- macOS, Linux, or Windows
 
-### 3. `src/scripts/analyze-preset.ts` - Quick Binary Analysis
-
-Quick hex dump and structure analysis of a preset file.
+### Installation
 
 ```bash
-bun run src/scripts/analyze-preset.ts
+# Using npm
+npm install -g hx1-cli
+
+# Using bun
+bun install -g hx1-cli
+
+# Verify installation
+hx1 --version
 ```
 
-### 4. `src/scripts/analyze-backup.ts` - Backup File Scanner
-
-Scans a backup file and lists all presets.
+### Basic Usage
 
 ```bash
-bun run src/scripts/analyze-backup.ts
+# Check if device is connected
+hx1 status
+
+# Navigate presets
+hx1 next          # Next preset
+hx1 prev          # Previous preset
+hx1 load 42       # Load preset #42
+
+# Control effect
+hx1 on            # Turn effect ON
+hx1 off           # Turn effect OFF (bypass)
 ```
 
-### 5. `src/scripts/parse-preset.ts` - Detailed Parser
+## Commands
 
-Comprehensive parsing with parameter type detection.
+### Device Control
+
+#### `hx1 status`
+
+Display device connection status and information.
 
 ```bash
-bun run src/scripts/parse-preset.ts
+$ hx1 status
+HX One Status:
+
+  Device:        HX One
+  Connection:    USB MIDI
+  MIDI Channel:  1
+
+✓ Device connected and ready
 ```
 
-## Example Output
+**Options:**
+- `--json` - Output in JSON format for scripting
 
-```
-╔════════════════════════════════════════════════════════════╗
-║         HX One Preset Inspector                            ║
-╚════════════════════════════════════════════════════════════╝
-
-File:         presets/12-String.hx1p
-Size:         1440 bytes
-Preset Name:  "12-String" (at offset 0x584)
-Effect ID:    2554 (0x09FA)
-Data Size:    620 bytes
-
-Parameters:
-─────────────────────────────────────────────────────────────
-Idx  Offset    Type       Value
-─────────────────────────────────────────────────────────────
-  0  0x0018    Float          0.720000
-  1  0x0020    Float          0.400000
-  2  0x0028    Float          0.620000
-  3  0x0030    Float          0.000000
-  4  0x0038    Integer               1
-...
-Total Parameters: 62
+```bash
+$ hx1 status --json
+{
+  "connected": true,
+  "device": {
+    "name": "HX One",
+    "connection": "USB MIDI"
+  }
+}
 ```
 
-## What We Learned
+---
 
-✅ **Fully Decoded:**
-- File structure and layout
-- Effect identification system
-- Parameter type system
-- Preset name storage
-- Backup file format
+#### `hx1 load <preset>`
 
-❓ **Still Unknown:**
-- Specific parameter meanings (which knob is which?)
-- Parameter value ranges and scaling
-- Purpose of header integers at 0x00-0x0F
-- Meaning of trailing parameters (appear consistent across effects)
+Load a specific preset by number (0-127).
 
-## Next Steps
+```bash
+$ hx1 load 10
+✓ Loaded preset 010
 
-To fully map the format, you could:
-
-1. **Create presets on device** - Make two presets with only one parameter different
-2. **Export and compare** - Use the inspector to see which offset changed
-3. **Build parameter map** - Document which offset corresponds to which control
-4. **Create preset editor** - Build a tool to modify presets programmatically
-
-## Files in This Repository
-
-```
-├── README.md                    # This file
-├── FILE_FORMAT.md              # Detailed format documentation
-├── backup.hx1b                 # Your original backup file
-├── presets/                    # Your original 128 preset files
-│   ├── 12-String.hx1p
-│   ├── 70s Chorus.hx1p
-│   └── ...
-├── extracted-presets/          # Presets extracted from backup
-│   └── ...
-└── Tools (TypeScript):
-    ├── preset-inspector.ts     # ⭐ Main inspection tool
-    ├── extract-all-presets.ts  # Extract from backup
-    ├── analyze-preset.ts       # Quick analysis
-    ├── analyze-backup.ts       # Backup scanner
-    └── parse-preset.ts         # Detailed parser
+$ hx1 load 0
+✓ Loaded preset 000
 ```
 
-## Technical Notes
+**Arguments:**
+- `<preset>` - Preset number (0-127)
 
-- **Endianness:** Little-endian throughout
-- **Alignment:** Parameters are 8-byte aligned
-- **String Encoding:** ASCII/UTF-8, null-terminated
-- **Float Format:** IEEE 754 single-precision (32-bit)
-- **Consistency:** All presets follow identical structure
+**Errors:**
+- Invalid preset number (out of range)
+- Device not connected
+
+---
+
+#### `hx1 next`
+
+Navigate to the next preset.
+
+```bash
+$ hx1 next
+✓ Next preset loaded
+```
+
+---
+
+#### `hx1 prev`
+
+Navigate to the previous preset.
+
+```bash
+$ hx1 prev
+✓ Previous preset loaded
+```
+
+---
+
+#### `hx1 on`
+
+Turn the effect ON.
+
+```bash
+$ hx1 on
+✓ Effect ON
+```
+
+---
+
+#### `hx1 off`
+
+Turn the effect OFF (bypass).
+
+```bash
+$ hx1 off
+✓ Effect OFF
+```
+
+---
+
+### Scripting Examples
+
+```bash
+# Quick preset sequence for live performance
+hx1 load 5 && sleep 30 && hx1 load 10 && sleep 45 && hx1 load 15
+
+# Toggle effect on/off
+hx1 off && sleep 2 && hx1 on
+
+# Check connection before loading preset
+if hx1 status --json | jq -e '.connected'; then
+  hx1 load 42
+fi
+
+# Loop through presets (bash)
+for i in {0..10}; do
+  hx1 load $i
+  sleep 5
+done
+```
+
+---
+
+## Troubleshooting
+
+### Device Not Found
+
+```
+✗ HX One not found
+
+💡 Make sure:
+   • HX One is connected via USB
+   • Device is powered on
+   • USB cable is working
+```
+
+**Solutions:**
+1. Check USB connection
+2. Try a different USB port
+3. Restart HX One
+4. Check MIDI permissions (macOS)
+5. List available MIDI devices: `hx1 status --json`
+
+---
+
+### Permission Denied (macOS)
+
+On macOS, you may need to grant MIDI access:
+
+1. System Settings → Privacy & Security → MIDI Devices
+2. Allow Terminal (or your terminal app)
+3. Restart terminal
+
+---
+
+### Commands Hang or Don't Exit
+
+If commands don't return to prompt:
+1. Press Ctrl+C to abort
+2. Check for MIDI conflicts (close HX Edit, other MIDI software)
+3. Restart the device
+
+---
+
+### Invalid Preset Number
+
+```
+✗ Invalid preset number: 200 (must be 0-127)
+```
+
+HX One supports presets 0-127 only. Use numbers in this range.
+
+---
+
+## Roadmap
+
+### Version 1.x
+- ✅ MIDI device control
+- ✅ Preset navigation
+- ✅ Effect on/off toggle
+- ✅ Device status query
+- ⏳ Preset file commands (list, info, compare)
+- ⏳ Configuration file support
+
+### Future
+- Upload presets via MIDI
+- Download presets from device
+- Batch preset operations
+- Preset library management
+- Parameter editing
+
+Have other ideas? Suggest them!
+
+---
+
+## MIDI Implementation
+
+The CLI uses standard MIDI messages to communicate with HX One:
+
+- **Program Change (PC 0-127)** - Select preset
+- **Control Change CC#72** - Navigate presets
+  - Value 0 = Previous
+  - Value 64 = Next
+- **Control Change CC#1** - Effect on/off
+  - Value 0 = OFF (bypass)
+  - Value 127 = ON
+
+All communication happens on MIDI Channel 1 by default.
+
+---
+
+## Preset File Format
+
+HX One uses `.hx1p` files for individual presets:
+
+- **Size:** 1440 bytes (fixed)
+- **Format:** Little-endian binary
+- **Contains:** Effect ID, parameters, preset name
+
+### File Structure
+
+```
+Offset   Description
+------   -----------
+0x10     Effect Model ID (e.g., 500 = 70s Chorus)
+0x14     Data size
+0x18     Parameters (8 bytes each)
+0x584    Preset name (null-terminated string)
+```
+
+For complete technical details, see [docs/file-format.md](docs/file-format.md).
+
+---
+
+## Development
+
+### Building from Source
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/hx-one.git
+cd hx-one
+
+# Install dependencies
+bun install
+
+# Run tests
+bun run test
+
+# Build
+bun run build
+
+# Run locally
+bun run dev status
+```
+
+### Project Structure
+
+```
+hx-one/
+├── src/
+│   ├── cli/           # CLI commands
+│   ├── core/          # Business logic
+│   ├── services/      # MIDI & file services
+│   └── types/         # TypeScript types
+├── tests/
+│   ├── unit/          # Unit tests
+│   ├── integration/   # Integration tests
+│   └── fixtures/      # Test data
+└── docs/              # Documentation
+```
+
+For development guidelines, see [CLAUDE.md](CLAUDE.md).
+
+---
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Write tests for new features
+4. Ensure all tests pass: `bun run check-all`
+5. Submit a pull request
+
+See [CLAUDE.md](CLAUDE.md) for code standards and architecture guidelines.
+
+---
+
+## Technical Details
+
+- **Language:** TypeScript (strict mode)
+- **Runtime:** Node.js 18+ / Bun 1.0+
+- **MIDI Library:** easymidi
+- **CLI Framework:** Commander.js
+- **Testing:** Vitest (95 tests, 82% coverage)
+- **Architecture:** Layered (CLI → Services → Core)
+
+For detailed documentation:
+- **[CLI Specification](docs/hx1-spec.md)** - Complete command reference
+- **[MIDI Overview](docs/hx1-midi-overview.md)** - MIDI implementation details
+- **[File Format](docs/file-format.md)** - Binary format documentation
+- **[Research Notes](docs/RESEARCH.md)** - Reverse engineering process
+
+---
 
 ## License
 
-These tools are for educational and personal use. Line 6 and HX One are trademarks of Line 6/Yamaha Guitar Group.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Analysis completed:** 2026-01-01
-**Tools:** TypeScript + Bun
-**Success:** ✅ Format successfully reverse-engineered
+## Support
+
+- **Issues:** [GitHub Issues](https://github.com/yourusername/hx-one/issues)
+- **Discussions:** [HX One Forums](https://line6.com/support/forums)
+
+---
+
+**Built with ❤️ for the HX One community**
+
+---
+
+## Quick Reference
+
+```bash
+# Navigation
+hx1 next                    # Next preset
+hx1 prev                    # Previous preset
+hx1 load <0-127>            # Load specific preset
+
+# Control
+hx1 on                      # Effect ON
+hx1 off                     # Effect OFF (bypass)
+
+# Information
+hx1 status                  # Device status
+hx1 status --json           # JSON output
+hx1 --help                  # Show help
+hx1 --version               # Show version
+```

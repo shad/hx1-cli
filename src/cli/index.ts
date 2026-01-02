@@ -18,7 +18,7 @@ const program = new Command();
 program
   .name('hx1')
   .description('Professional CLI tool for Line 6 HX One guitar effects pedal')
-  .version('0.1.0');
+  .version('1.0.0');
 
 /**
  * hx1 next - Load next preset
