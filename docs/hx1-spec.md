@@ -41,8 +41,8 @@ The `hx1` command-line tool provides complete control over your Line 6 HX One gu
 ## Installation & Setup
 
 ```bash
-# Install globally (future)
-npm install -g hx1-cli
+# Install globally
+npm install -g @shadr/hx1-cli
 
 # Or use directly with bun (current)
 bun install

@@ -1,5 +1,9 @@
-# built executable
+# built executables
 hx1
+hx1-test
+hx1.exe
+hx1-*.tar.gz
+hx1-*.zip
 
 # Claude Code
 .claude

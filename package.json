@@ -1,5 +1,5 @@
 {
-  "name": "hx1-cli",
+  "name": "@shadr/hx1-cli",
   "version": "1.0.0",
   "description": "CLI tool for Line 6 HX One guitar effects pedal",
   "main": "dist/index.js",

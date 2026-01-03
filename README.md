@@ -35,20 +35,55 @@ Tested on HX One firmware `v3.83`
 
 ### Prerequisites
 
-- Node.js 18+ or Bun 1.0+
 - HX One connected via USB
 - macOS, Linux, or Windows
 
 ### Installation
 
+#### Option 1: Standalone Binary (Recommended - No Node.js required)
+
+Download the pre-built binary for your platform from [Releases](https://github.com/shad/hx-one/releases/latest):
+
+**macOS:**
+```bash
+# Intel Mac
+curl -L https://github.com/shad/hx-one/releases/latest/download/hx1-macos-x64.tar.gz | tar xz
+sudo mv hx1 /usr/local/bin/
+
+# Apple Silicon (M1/M2/M3)
+curl -L https://github.com/shad/hx-one/releases/latest/download/hx1-macos-arm64.tar.gz | tar xz
+sudo mv hx1 /usr/local/bin/
+```
+
+**Linux:**
+```bash
+# x64
+curl -L https://github.com/shad/hx-one/releases/latest/download/hx1-linux-x64.tar.gz | tar xz
+sudo mv hx1 /usr/local/bin/
+
+# ARM64
+curl -L https://github.com/shad/hx-one/releases/latest/download/hx1-linux-arm64.tar.gz | tar xz
+sudo mv hx1 /usr/local/bin/
+```
+
+**Windows:**
+1. Download [hx1-windows-x64.zip](https://github.com/shad/hx-one/releases/latest/download/hx1-windows-x64.zip)
+2. Extract `hx1.exe`
+3. Add to your PATH or run directly
+
+#### Option 2: Via npm (requires Node.js 18+)
+
 ```bash
 # Using npm
-npm install -g hx1-cli
+npm install -g @shadr/hx1-cli
 
 # Using bun
-bun install -g hx1-cli
+bun install -g @shadr/hx1-cli
+```
 
-# Verify installation
+#### Verify Installation
+
+```bash
 hx1 --version
 ```
 
