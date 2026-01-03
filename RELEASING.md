@@ -7,11 +7,13 @@ This document describes how to create a new release of HX One CLI.
 1. All changes committed and pushed to `main`
 2. All tests passing: `bun run check-all`
 3. CHANGELOG.md updated with changes for this version
-4. (Optional) NPM_TOKEN secret configured in GitHub repository settings
+4. npm account with publish access to `@shadr/hx1-cli`
 
 ## Release Steps
 
 ### 1. Update Version
+
+Choose the appropriate version bump based on the changes:
 
 ```bash
 # Choose one:
@@ -35,60 +37,51 @@ git push origin main --tags
 ```
 
 This triggers the GitHub Actions workflow that will:
-- ✅ Build executables for all platforms (macOS x64, macOS ARM64, Linux x64, Linux ARM64, Windows x64)
 - ✅ Run all tests
-- ✅ Create platform-specific archives (.tar.gz for Unix, .zip for Windows)
-- ✅ Create a GitHub Release with all binaries attached
-
-**Note:** npm publishing is done manually (see step 5)
+- ✅ Run type checking
+- ✅ Run linting
+- ✅ Build the package
+- ✅ Validate the release is ready
 
 ### 3. Monitor GitHub Actions
 
 1. Go to https://github.com/shad/hx1-cli/actions
-2. Watch the "Release" workflow
-3. Ensure all jobs complete successfully
+2. Watch the "Release Validation" workflow
+3. Ensure all checks pass successfully
 
-### 4. Verify GitHub Release
+### 4. Publish to npm
 
-After the workflow completes:
-
-1. **Check GitHub Release:**
-   - Visit https://github.com/shad/hx1-cli/releases/latest
-   - Verify all 5 platform binaries are attached
-   - Verify release notes look good
-
-2. **Test a Binary Download:**
-   ```bash
-   # Download and test one of the binaries
-   curl -L https://github.com/shad/hx1-cli/releases/latest/download/hx1-macos-arm64.tar.gz | tar xz
-   ./hx1 --version
-   ```
-
-### 5. Publish to npm (Manual)
-
-After verifying the GitHub release:
+After the GitHub Actions validation passes:
 
 ```bash
 # Make sure you're on the tagged version
-git checkout v1.0.0  # or whatever version
+git checkout v1.0.1  # or whatever version you just created
 
-# Login to npm
+# Login to npm (if not already logged in)
 npm login
 
-# Run all checks
+# Run all checks locally one final time
 bun run check-all
 
-# Build
+# Build the package
 bun run build
 
 # Publish (--access public required for scoped packages)
 npm publish --access public
 ```
 
-Verify the npm package:
+### 5. Verify npm Package
+
+After publishing, verify the package is available:
+
 ```bash
+# View package info
 npm view @shadr/hx1-cli
+
+# Test installation in a clean environment
 npm install -g @shadr/hx1-cli
+
+# Verify it works
 hx1 --version
 ```
 
@@ -102,28 +95,48 @@ After verifying the release:
 
 ## npm Publishing Notes
 
-npm publishing is always done manually for security. The `--access public` flag is required for scoped packages (@shadr/hx1-cli) to make them publicly available.
+**Why manual npm publishing?**
+- Manual publishing keeps npm tokens secure and under tight control
+- Allows final verification before release
+- Gives opportunity to test the built package locally
+
+**The `--access public` flag:**
+- Required for scoped packages (`@shadr/hx1-cli`)
+- Makes the package publicly available on npm
+- Without it, scoped packages default to private (requires paid npm account)
 
 **Never commit your npm token to the repository.**
 
 ## Troubleshooting
 
-### GitHub Actions fails to build executables
+### GitHub Actions validation fails
 
 - Check the Actions log for specific errors
-- Ensure Bun version is compatible
-- Verify all dependencies are listed in package.json
-
-### Release doesn't include all binaries
-
-- Check that all build jobs completed successfully
-- Verify artifact upload/download steps in workflow
+- Ensure all tests pass locally: `bun run check-all`
+- Fix issues and push again (no need to re-tag unless you want to)
 
 ### npm publish fails
 
-- Verify NPM_TOKEN is set correctly
-- Check that version doesn't already exist on npm
-- Ensure you have permissions to publish the package
+**Version already exists:**
+```
+npm ERR! 403 You cannot publish over the previously published versions
+```
+Solution: Bump version again with `npm version patch` (or minor/major)
+
+**Not logged in:**
+```
+npm ERR! need auth This command requires you to be logged in
+```
+Solution: Run `npm login` first
+
+**No publish permissions:**
+```
+npm ERR! 403 You do not have permission to publish "@shadr/hx1-cli"
+```
+Solution: Verify you're logged in with the correct npm account that owns the `@shadr` scope
+
+**Package not found after publishing:**
+Wait a few minutes - npm CDN can take time to propagate. Check https://www.npmjs.com/package/@shadr/hx1-cli
 
 ## Rollback
 
@@ -136,11 +149,13 @@ git tag -d v1.0.1
 # Delete the tag remotely
 git push origin :refs/tags/v1.0.1
 
-# Delete the GitHub release (via GitHub UI)
-
-# Unpublish from npm (if published - only within 72 hours)
+# Unpublish from npm (only within 72 hours of publishing)
 npm unpublish @shadr/hx1-cli@1.0.1
 ```
+
+**Important:** npm has restrictions on unpublishing:
+- Can only unpublish within 72 hours of publishing
+- After 72 hours, you can only deprecate: `npm deprecate @shadr/hx1-cli@1.0.1 "This version has issues, please upgrade"`
 
 ## Version Guidelines
 
@@ -155,10 +170,31 @@ Follow [Semantic Versioning](https://semver.org/):
 For testing before official release:
 
 ```bash
+# Create a pre-release version
 npm version prerelease --preid=beta
 # Creates: 1.0.1-beta.0
 
+# Push tag
 git push origin main --tags
+
+# Publish with beta tag (doesn't affect "latest" tag)
+npm publish --access public --tag beta
+
+# Users can install with:
+# npm install -g @shadr/hx1-cli@beta
 ```
 
-This creates a release but marks it as "pre-release" on GitHub.
+This creates a release but marks it as pre-release, allowing testing without affecting the stable release.
+
+## Quick Reference
+
+```bash
+# Full release workflow
+npm version patch                    # Bump version, create tag
+git push origin main --tags          # Push to GitHub, trigger validation
+npm login                            # Login to npm (if needed)
+bun run check-all                    # Final local verification
+bun run build                        # Build package
+npm publish --access public          # Publish to npm
+npm view @shadr/hx1-cli             # Verify publication
+```
