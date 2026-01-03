@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "hx1": "./dist/index.js"
+    "hx1": "./dist/cli/index.js"
   },
   "files": [
     "dist/",
@@ -22,14 +22,14 @@
   "homepage": "https://github.com/shad/hx-one#readme",
   "scripts": {
     "dev": "bun run src/cli/index.ts",
-    "build": "bun build src/cli/index.ts --outdir dist --target bun",
+    "build": "rm -rf dist && tsc && chmod +x dist/cli/index.js",
     "build-executable": "bun build src/cli/index.ts --compile --outfile hx1",
     "test": "vitest run --coverage",
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
+    "lint": "eslint 'src/**/*.ts' --ignore-pattern 'src/scripts/**'",
+    "lint:fix": "eslint 'src/**/*.ts' --ignore-pattern 'src/scripts/**' --fix",
     "check-all": "bun run check-types && bun run lint && bun run test",
     "complexity": "npx eslint src/**/*.ts --plugin complexity --rule 'complexity: [error, 10]'",
     "prepublishOnly": "bun run check-all && bun run build"

@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 /**
  * HX One CLI - Main entry point
@@ -15,8 +15,9 @@ import {
   InvalidPresetNumberError,
 } from '../types/midi.js';
 import { parsePreset } from '../core/preset/parser.js';
-import { comparePresets, getComparisonSummary } from '../core/preset/comparator.js';
+import { comparePresets } from '../core/preset/comparator.js';
 import { InvalidPresetError, ParameterType } from '../types/preset.js';
+import { printComparison } from './format.js';
 
 const program = new Command();
 
@@ -25,15 +26,11 @@ program
   .description('Professional CLI tool for Line 6 HX One guitar effects pedal')
   .version('1.0.0');
 
-/**
- * hx1 next - Load next preset
- */
 program
   .command('next')
   .description('Load the next preset')
-  .action(async () => {
+  .action(() => {
     const midi = new MidiService();
-
     try {
       // Auto-detect device if needed
       const deviceName = MidiService.findHxOneDevice();
@@ -56,15 +53,11 @@ program
     }
   });
 
-/**
- * hx1 prev - Load previous preset
- */
 program
   .command('prev')
   .description('Load the previous preset')
-  .action(async () => {
+  .action(() => {
     const midi = new MidiService();
-
     try {
       const deviceName = MidiService.findHxOneDevice();
       if (!deviceName) {
@@ -82,14 +75,11 @@ program
     }
   });
 
-/**
- * hx1 load <preset> - Load specific preset
- */
 program
   .command('load')
   .description('Load a specific preset by number')
   .argument('<preset>', 'Preset number (0-127)')
-  .action(async (presetArg: string) => {
+  .action((presetArg: string) => {
     const preset = parseInt(presetArg, 10);
 
     if (isNaN(preset)) {
@@ -119,15 +109,11 @@ program
     }
   });
 
-/**
- * hx1 toggle - Toggle effect on/off
- */
 program
   .command('toggle')
   .description('Toggle the effect on/off (emulates footswitch press)')
-  .action(async () => {
+  .action(() => {
     const midi = new MidiService();
-
     try {
       const deviceName = MidiService.findHxOneDevice();
       if (!deviceName) {
@@ -145,15 +131,11 @@ program
     }
   });
 
-/**
- * hx1 flux - Activate FLUX function
- */
 program
   .command('flux')
   .description('Activate FLUX function (momentary effect variation)')
-  .action(async () => {
+  .action(() => {
     const midi = new MidiService();
-
     try {
       const deviceName = MidiService.findHxOneDevice();
       if (!deviceName) {
@@ -171,14 +153,11 @@ program
     }
   });
 
-/**
- * hx1 status - Show device status
- */
 program
   .command('status')
   .description('Show current device and preset status')
   .option('-j, --json', 'Output JSON')
-  .action(async (options: { json?: boolean }) => {
+  .action((options: { json?: boolean }) => {
     const midi = new MidiService();
 
     try {
@@ -230,9 +209,6 @@ program
     }
   });
 
-/**
- * hx1 info <file> - Display preset file information
- */
 program
   .command('info <file>')
   .description('Display preset file information')
@@ -256,7 +232,9 @@ program
 
       for (let i = 0; i < preset.parameters.length; i++) {
         const param = preset.parameters[i];
-        if (!param) continue;
+        if (!param) {
+          continue;
+        }
 
         const idx = i.toString().padStart(3);
         const typeName = ParameterType[param.type].padEnd(9);
@@ -278,9 +256,6 @@ program
     }
   });
 
-/**
- * hx1 compare <file1> <file2> - Compare two preset files
- */
 program
   .command('compare <file1> <file2>')
   .description('Compare two preset files')
@@ -296,71 +271,12 @@ program
       const preset2 = parsePreset(data2);
 
       const comparison = comparePresets(preset1, preset2);
-      const summary = getComparisonSummary(comparison);
 
-      console.log(chalk.bold('\nPreset Comparison:\n'));
-
-      // File names
-      console.log('  File 1:', chalk.cyan(file1));
-      console.log('  File 2:', chalk.cyan(file2));
-      console.log('');
-
-      // Names
-      console.log('  Name 1:', preset1.name);
-      console.log('  Name 2:', preset2.name);
-      if (comparison.sameName) {
-        console.log('         ', chalk.green('✓ Same name'));
-      } else {
-        console.log('         ', chalk.yellow('✗ Different names'));
-      }
-      console.log('');
-
-      // Effect IDs
-      console.log('  Effect 1:', preset1.effectId, chalk.gray(`(0x${preset1.effectId.toString(16).toUpperCase()})`));
-      console.log('  Effect 2:', preset2.effectId, chalk.gray(`(0x${preset2.effectId.toString(16).toUpperCase()})`));
-      if (comparison.sameEffect) {
-        console.log('           ', chalk.green('✓ Same effect'));
-      } else {
-        console.log('           ', chalk.red('✗ Different effects'));
-      }
-      console.log('');
-
-      // Parameter summary
-      console.log(chalk.bold('Parameter Summary:\n'));
-      console.log('  Total:      ', summary.totalParameters);
-      console.log('  Same:       ', chalk.green(summary.unchangedParameters));
-      console.log('  Different:  ', summary.changedParameters > 0 ? chalk.yellow(summary.changedParameters) : summary.changedParameters);
-      console.log('');
-
-      // Show different parameters
-      if (comparison.differentParameters.length > 0) {
-        console.log(chalk.bold('Different Parameters:\n'));
-        console.log(chalk.gray('  Idx  Type       Value 1        Value 2'));
-        console.log(chalk.gray('  ───  ─────────  ─────────────  ─────────────'));
-
-        for (const idx of comparison.differentParameters) {
-          const param1 = preset1.parameters[idx];
-          const param2 = preset2.parameters[idx];
-
-          const idxStr = idx.toString().padStart(3);
-          const type1 = param1 ? ParameterType[param1.type] : 'Missing';
-          const type2 = param2 ? ParameterType[param2.type] : 'Missing';
-          const typeName = (param1 ? type1 : type2).padEnd(9);
-
-          const val1 = param1
-            ? (param1.type === ParameterType.Float ? param1.value.toFixed(6) : param1.value.toString()).padEnd(13)
-            : 'N/A'.padEnd(13);
-
-          const val2 = param2
-            ? (param2.type === ParameterType.Float ? param2.value.toFixed(6) : param2.value.toString())
-            : 'N/A';
-
-          console.log(`  ${idxStr}  ${typeName}  ${chalk.yellow(val1)}  ${chalk.yellow(val2)}`);
-        }
-        console.log('');
-      } else {
-        console.log(chalk.green('✓ All parameters are identical\n'));
-      }
+      printComparison(
+        { file1, file2 },
+        { preset1, preset2 },
+        comparison
+      );
 
       process.exit(0);
     } catch (error) {
@@ -372,9 +288,6 @@ program
     }
   });
 
-/**
- * Handle errors and exit appropriately
- */
 function handleError(error: unknown): never {
   if (error instanceof DeviceNotFoundError) {
     console.error(chalk.red('✗'), error.message);

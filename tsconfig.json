@@ -2,8 +2,8 @@
   "compilerOptions": {
     // Language and Module
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
 
     // Strict Type Checking
@@ -48,12 +48,17 @@
     "types": ["node", "vitest/globals"]
   },
   "include": [
-    "src/**/*"
+    "src/cli/**/*",
+    "src/core/**/*",
+    "src/services/**/*",
+    "src/types/**/*",
+    "src/utils/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "tests",
+    "src/scripts",
     "**/*.test.ts",
     "**/*.spec.ts"
   ]

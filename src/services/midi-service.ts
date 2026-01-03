@@ -197,7 +197,7 @@ export class MidiService {
           const firmwareBytes = bytes.slice(8, -1);
           const firmwareText = String.fromCharCode(...firmwareBytes);
           const versionMatch = firmwareText.match(/L6ImageVersion:([^\0]+)/);
-          const firmware = versionMatch ? versionMatch[1] : 'Unknown';
+          const firmware: string = versionMatch?.[1] ?? 'Unknown';
 
           resolve({
             name: this.deviceName,
@@ -210,6 +210,11 @@ export class MidiService {
           reject(new MidiCommunicationError('Invalid device response'));
         }
       };
+
+      if (!this.input || !this.output) {
+        reject(new MidiCommunicationError('Not connected to device'));
+        return;
+      }
 
       this.input.on('sysex', handler);
 
@@ -266,6 +271,11 @@ export class MidiService {
           });
         }
       };
+
+      if (!this.input) {
+        resolve(null);
+        return;
+      }
 
       this.input.on('sysex', handler);
     });

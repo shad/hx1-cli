@@ -102,7 +102,7 @@ function parseParameters(
 
     // Interpret value based on type
     let value: number;
-    if (type === ParameterType.Float) {
+    if ((type as ParameterType) === ParameterType.Float) {
       // Reinterpret bytes as float
       value = view.getFloat32(offset + 4, true);
     } else {
