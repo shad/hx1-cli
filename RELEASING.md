@@ -39,7 +39,8 @@ This triggers the GitHub Actions workflow that will:
 - ✅ Run all tests
 - ✅ Create platform-specific archives (.tar.gz for Unix, .zip for Windows)
 - ✅ Create a GitHub Release with all binaries attached
-- ✅ Publish to npm (if NPM_TOKEN secret is set)
+
+**Note:** npm publishing is done manually (see step 5)
 
 ### 3. Monitor GitHub Actions
 
@@ -47,7 +48,7 @@ This triggers the GitHub Actions workflow that will:
 2. Watch the "Release" workflow
 3. Ensure all jobs complete successfully
 
-### 4. Verify Release
+### 4. Verify GitHub Release
 
 After the workflow completes:
 
@@ -63,14 +64,35 @@ After the workflow completes:
    ./hx1 --version
    ```
 
-3. **Check npm (if published):**
-   ```bash
-   npm view @shadr/hx1-cli
-   npm install -g @shadr/hx1-cli
-   hx1 --version
-   ```
+### 5. Publish to npm (Manual)
 
-### 5. Announce
+After verifying the GitHub release:
+
+```bash
+# Make sure you're on the tagged version
+git checkout v1.0.0  # or whatever version
+
+# Login to npm
+npm login
+
+# Run all checks
+bun run check-all
+
+# Build
+bun run build
+
+# Publish (--access public required for scoped packages)
+npm publish --access public
+```
+
+Verify the npm package:
+```bash
+npm view @shadr/hx1-cli
+npm install -g @shadr/hx1-cli
+hx1 --version
+```
+
+### 6. Announce
 
 After verifying the release:
 
@@ -78,35 +100,11 @@ After verifying the release:
 2. Share in relevant communities (Reddit, Discord, etc.)
 3. Update any documentation sites
 
-## Setting Up npm Publishing (Optional)
+## npm Publishing Notes
 
-To enable automatic npm publishing on release:
+npm publishing is always done manually for security. The `--access public` flag is required for scoped packages (@shadr/hx1-cli) to make them publicly available.
 
-1. Create an npm access token:
-   - Go to https://www.npmjs.com/settings/[username]/tokens
-   - Click "Generate New Token"
-   - Choose "Automation"
-   - Copy the token
-
-2. Add to GitHub repository secrets:
-   - Go to https://github.com/shad/hx-one/settings/secrets/actions
-   - Click "New repository secret"
-   - Name: `NPM_TOKEN`
-   - Value: [paste your npm token]
-
-## Manual npm Publishing
-
-If you prefer to publish to npm manually:
-
-```bash
-# After creating the tag and GitHub release
-npm login
-bun run check-all
-bun run build
-npm publish --access public
-```
-
-**Note:** The `--access public` flag is required for scoped packages (@shadr/hx1-cli) to make them publicly available.
+**Never commit your npm token to the repository.**
 
 ## Troubleshooting
 

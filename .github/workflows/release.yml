@@ -147,7 +147,7 @@ jobs:
 
             ### Via npm (requires Node.js)
             ```bash
-            npm install -g hx1-cli
+            npm install -g @shadr/hx1-cli
             ```
 
             ## Verify Installation
@@ -155,29 +155,5 @@ jobs:
             hx1 --version
             ```
 
-  npm-publish:
-    name: Publish to npm
-    needs: build
-    runs-on: ubuntu-latest
-    # Only publish to npm if you set the NPM_TOKEN secret
-    if: ${{ secrets.NPM_TOKEN != '' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Run tests
-        run: bun run check-all
-
-      - name: Build for npm
-        run: bun run build
-
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  # npm publishing is done manually for security
+  # See RELEASING.md for manual npm publish instructions
