@@ -14,12 +14,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shad/hx-one.git"
+    "url": "git+https://github.com/shad/hx1-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/shad/hx-one/issues"
+    "url": "https://github.com/shad/hx1-cli/issues"
   },
-  "homepage": "https://github.com/shad/hx-one#readme",
+  "homepage": "https://github.com/shad/hx1-cli#readme",
   "scripts": {
     "dev": "bun run src/cli/index.ts",
     "build": "rm -rf dist && tsc && chmod +x dist/cli/index.js",

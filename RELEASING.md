@@ -44,7 +44,7 @@ This triggers the GitHub Actions workflow that will:
 
 ### 3. Monitor GitHub Actions
 
-1. Go to https://github.com/shad/hx-one/actions
+1. Go to https://github.com/shad/hx1-cli/actions
 2. Watch the "Release" workflow
 3. Ensure all jobs complete successfully
 
@@ -53,14 +53,14 @@ This triggers the GitHub Actions workflow that will:
 After the workflow completes:
 
 1. **Check GitHub Release:**
-   - Visit https://github.com/shad/hx-one/releases/latest
+   - Visit https://github.com/shad/hx1-cli/releases/latest
    - Verify all 5 platform binaries are attached
    - Verify release notes look good
 
 2. **Test a Binary Download:**
    ```bash
    # Download and test one of the binaries
-   curl -L https://github.com/shad/hx-one/releases/latest/download/hx1-macos-arm64.tar.gz | tar xz
+   curl -L https://github.com/shad/hx1-cli/releases/latest/download/hx1-macos-arm64.tar.gz | tar xz
    ./hx1 --version
    ```
 
