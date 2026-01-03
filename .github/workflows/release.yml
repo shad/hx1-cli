@@ -57,11 +57,8 @@ jobs:
         run: bun run test
 
       - name: Build executable
-        run: |
-          bun build src/cli/index.ts \
-            --compile \
-            --target=${{ matrix.target }} \
-            --outfile hx1
+        # Note: Command must be on one line - PowerShell doesn't support backslash line continuations
+        run: bun build src/cli/index.ts --compile --target=${{ matrix.target }} --outfile hx1
 
       - name: Create archive (Unix)
         if: matrix.archive == 'tar.gz'
